@@ -23,10 +23,7 @@ using namespace std;
 #define MAX_CLIENTS 50
 #define BUFFER_SIZE 8192
 // GLobals
-atomic<int> current_number_of_clients = 0; // prevent race conditions
-
-
-
+atomic<int> current_number_of_clients(0); // prevent race conditions
 
 string bufToString(char buffferReader[], int len){
 	string ans = "";
@@ -108,6 +105,7 @@ string createResponse(string type, string body){
 void serve(int client_socket){
     char bufferReader[BUFFER_SIZE];
     int sent_bytes;
+
     // Keep serving till timeout
     while(true){
         sent_bytes = recv(client_socket, bufferReader, BUFFER_SIZE, 0);
@@ -117,11 +115,12 @@ void serve(int client_socket){
             cout << "Closing connection" << endl;
             break;
         }
-        string body = "";
+
         string allRequest = bufToString(bufferReader, sent_bytes);
         string type = getType(allRequest);
-    
         int contentLen = getContentLength(allRequest);
+
+        string body = "";
         if(contentLen != 0)
             body = getBody(allRequest);   
         
@@ -129,7 +128,7 @@ void serve(int client_socket){
 
         // Read body
         while(currLen < contentLen){
-            sent_bytes = recv(client_socket, bufferReader,BUFFER_SIZE, 0);
+            sent_bytes = recv(client_socket, bufferReader, BUFFER_SIZE, 0);
             currLen += sent_bytes;
             body += bufToString(bufferReader, sent_bytes);
         }
@@ -146,6 +145,7 @@ void serve(int client_socket){
             sent += currSent;
             remaining -= currSent;
         }
+
     }
     current_number_of_clients--;
     close(client_socket);
@@ -153,6 +153,7 @@ void serve(int client_socket){
 
 
 int main(int argc, char const *argv[]){
+
     if(argc != 2){
         cout << "Port Number not specified!!";
         return -1;
@@ -210,13 +211,14 @@ int main(int argc, char const *argv[]){
 
         current_number_of_clients++;
         struct timeval timeout;
-        timeout.tv_usec = ((float) current_number_of_clients / MAX_CLIENTS) * 1000000 + 500000; // timeout faster if number of clients increases
+        timeout.tv_usec = ((float) MAX_CLIENTS / current_number_of_clients) * 1000000 + 500000; // timeout faster if number of clients increases
         timeout.tv_sec = 0;
         setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
         thread client_request(serve, client_socket); // serve client request while taking other requests concurently
         client_request.detach();
     }
+
     close(main_socket);
     return 0;
 }
