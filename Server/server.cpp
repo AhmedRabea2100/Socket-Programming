@@ -85,6 +85,7 @@ void serve(int client_socket)
 {
     char bufferReader[BUFFER_SIZE];
     int sent_bytes;
+
     // Keep serving till timeout
     while (true)
     {
@@ -96,11 +97,12 @@ void serve(int client_socket)
             cout << "Closing connection" << endl;
             break;
         }
-        string body = "";
+
         string allRequest = bufToString(bufferReader, sent_bytes);
         string type = getType(allRequest);
-
         int contentLen = getContentLength(allRequest);
+
+        string body = "";
         if (contentLen != 0)
             body = getBody(allRequest);
 
@@ -197,13 +199,14 @@ int main(int argc, char const *argv[])
 
         current_number_of_clients++;
         struct timeval timeout;
-        timeout.tv_usec = ((float)current_number_of_clients / MAX_CLIENTS) * 1000000 + 500000; // timeout faster if number of clients increases
+        timeout.tv_usec = ((float)MAX_CLIENTS / current_number_of_clients) * 1000000 + 500000; // timeout faster if number of clients increases
         timeout.tv_sec = 0;
         setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
         thread client_request(serve, client_socket); // serve client request while taking other requests concurently
         client_request.detach();
     }
+
     close(main_socket);
     return 0;
 }
