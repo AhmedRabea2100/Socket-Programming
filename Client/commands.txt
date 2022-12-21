@@ -1,0 +1,6 @@
+client_get /Assignment1.pdf
+client_get /file3.html
+client_post /file1.html
+client_post /file2.jpg
+client_get /file5.txt
+client_post /file5.txt
