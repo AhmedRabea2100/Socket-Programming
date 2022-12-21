@@ -3,21 +3,13 @@
 #include <bits/stdc++.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include <bits/stdc++.h>
 #include <fstream>
-#include <ctype.h>
 #include <thread>
 #include <pthread.h>
-#include <errno.h>
 #include "../Utilities/utilities.h"
 
 using namespace std;

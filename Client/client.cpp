@@ -2,11 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <string.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fstream>
@@ -67,6 +63,20 @@ int GET_response(int sockfd, string path)
     return 0;
 }
 
+string create_POST_request(string path)
+{
+    stringstream request;
+    request << "POST ";
+    request << path;
+    request << " HTTP/1.1\r\n";
+    pair<char *, int> fileInfo = getFileInfo(path.substr(1));
+    request << "Content-Length: " << fileInfo.second << "\r\n\r\n";
+    request.write(fileInfo.first, fileInfo.second);
+    request << "\r\n";
+    delete fileInfo.first;
+    return request.str();
+}
+
 int POST_response(int sockfd, string path)
 {
     char buffer[BUFFER_SIZE];
@@ -80,20 +90,6 @@ int POST_response(int sockfd, string path)
     string header = getHeader(response);
     cout << header << endl;
     return 0;
-}
-
-string create_POST_request(string path)
-{
-    stringstream request;
-    request << "POST ";
-    request << path;
-    request << " HTTP/1.1\r\n";
-    pair<char *, int> fileInfo = getFileInfo(path.substr(1));
-    request << "Content-Length: " << fileInfo.second << "\r\n\r\n";
-    request.write(fileInfo.first, fileInfo.second);
-    request << "\r\n";
-    delete fileInfo.first;
-    return request.str();
 }
 
 int main(int argc, char const *argv[])
