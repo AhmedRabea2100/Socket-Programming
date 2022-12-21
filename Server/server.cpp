@@ -85,7 +85,6 @@ void serve(int client_socket)
 
         if (sent_bytes == 0 || errno == EAGAIN || errno == EWOULDBLOCK)
         {
-            cout << "Serving client failed" << endl;
             cout << "Closing connection" << endl;
             break;
         }
@@ -175,7 +174,7 @@ int main(int argc, char const *argv[])
     // Socket open and waiting for clients
     while (true)
     {
-        cout << "Awaiting for clients....." << flush;
+        cout << "Awaiting for clients....." << endl << flush;
 
         int client_socket = accept(main_socket, (struct sockaddr *)&server_address, (socklen_t *)&lenAddr);
         if (client_socket < 0)
