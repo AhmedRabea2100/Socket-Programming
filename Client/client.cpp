@@ -59,7 +59,7 @@ int GET_response(int sockfd, string path)
         }
         body += bufToString(buffer, readBytes);
     }
-    writeFile(path.substr(1), body);
+    writeFile(path.substr(1), body); // to remove '/' in the begining
     return 0;
 }
 
@@ -69,11 +69,11 @@ string create_POST_request(string path)
     request << "POST ";
     request << path;
     request << " HTTP/1.1\r\n";
-    pair<char *, int> fileInfo = getFileInfo(path.substr(1));
+    pair<char *, int> fileInfo = getFileInfo(path.substr(1)); // to remove '/' in the begining
     request << "Content-Length: " << fileInfo.second << "\r\n\r\n";
     request.write(fileInfo.first, fileInfo.second);
     request << "\r\n";
-    delete fileInfo.first;
+    delete fileInfo.first; // clear heap
     return request.str();
 }
 
@@ -134,7 +134,7 @@ int main(int argc, char const *argv[])
         char *requestType = strtok(line, " ");
         char *p = strtok(NULL, "");
         string path = string(p);
-        path.pop_back();
+        path.pop_back(); // remove \n
         if (strcmp(requestType, "client_get") == 0)
         {
             string response = create_GET_request(path);
@@ -150,7 +150,7 @@ int main(int argc, char const *argv[])
         {
             string response = create_POST_request(path);
             int total = response.size();
-            int remaining = response.size();
+            int remaining = total;
             int sent = 0;
             while (sent < total)
             {
