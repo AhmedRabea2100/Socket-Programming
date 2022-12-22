@@ -109,11 +109,10 @@ void serve(int client_socket)
         }
 
         cout << "All data has been recieved" << endl;
-        // cout << type << endl << body <<endl;
 
         string response = createResponse(type, body);
         int total = response.size();
-        int remaining = response.size();
+        int remaining = total;
         int sent = 0;
         while (sent < total)
         {
